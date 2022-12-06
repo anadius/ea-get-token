@@ -1,4 +1,3 @@
-import sys
 import re
 import traceback
 import os
@@ -19,29 +18,24 @@ QUERY = '''
                 }
             }
             '''
-VERSION_DEFAULT = "12.38.0.5295"
-VERSION_FILE = "version.txt"
-
-
-if getattr(sys, "frozen", False):
-    os.chdir(os.path.dirname(sys.executable))
-elif __file__:
-    os.chdir(os.path.dirname(__file__))
+VERSION_DEFAULT = "12.61.0.5318"
+LOG = r"%LocalAppData%\Electronic Arts\EA Desktop\Logs\EALauncher.log"
+REG_EXP = r"\(eax::apps::utils::logAppInfo\)\s+Version:\s+(\d+\.\d+\.\d+[\-\.]\d+)"
 
 
 def load_version():
+    version = VERSION_DEFAULT
     try:
-        with open(VERSION_FILE) as f:
-            version = f.read().strip()
-        if re.match(r"^\d+\.\d+\.\d+\.\d+$") is None:
-            return VERSION_DEFAULT
+        with open(os.path.expandvars(LOG), encoding="utf-8") as f:
+            for line in f:
+                m = re.search(REG_EXP, line)
+                if m is None:
+                    continue
+                version = m.group(1)
     except:
-        return VERSION_DEFAULT
+        pass
 
-
-def save_version(version):
-    with open(VERSION_FILE, "w") as f:
-        f.write(version)
+    return version.replace("-", ".")
 
 
 def main():
@@ -62,17 +56,7 @@ def main():
 
     print("Got token!")
 
-    old_version = load_version()
-    print("EA app saved version:", old_version)
-    r = requests.get(
-        "https://autopatch.juno.ea.com/autopatch/upgrade/buckets/85",
-        headers={"User-Agent": f"EADesktop/{old_version}"},
-        timeout=15,
-    )
-    data = r.json()
-    version = data["recommended"]["version"]
-
-    print("EA app current version:", version)
+    version = load_version()
 
     r = requests.post(
         "https://service-aggregation-layer.juno.ea.com/graphql",
@@ -116,8 +100,6 @@ def main():
     print(persona_id)
 
     print()
-    if old_version != version:
-        save_version(version)
 
 
 if __name__ == "__main__":
