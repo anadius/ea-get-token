@@ -18,7 +18,7 @@ QUERY = '''
                 }
             }
             '''
-VERSION_DEFAULT = "12.61.0.5318"
+VERSION_DEFAULT = "13.128.0.5641"
 LOG = r"%LocalAppData%\Electronic Arts\EA Desktop\Logs\EALauncher.log"
 REG_EXP = r"\(eax::apps::utils::logAppInfo\)\s+Version:\s+(\d+\.\d+\.\d+[\-\.]\d+)"
 
