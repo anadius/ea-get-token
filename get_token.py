@@ -5,7 +5,7 @@ import os
 import pymem
 import requests
 
-PATTERN = br"authorization=Bearer ([a-zA-Z0-9=\._]{1,1000})"
+PATTERN = br"authorization=Bearer ([a-zA-Z0-9=\._\-]{1,10000})"
 QUERY = '''
             query getCurrentUser {
                 me {
@@ -50,7 +50,7 @@ def main():
         print("Access token not found, try again!")
         return
 
-    data = ea_app.read_bytes(offset, 1021)
+    data = ea_app.read_bytes(offset, 10021)
     match = re.match(PATTERN, data)
     token = match.group(1).decode()
 
