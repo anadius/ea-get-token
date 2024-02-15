@@ -1,0 +1,28 @@
+name: Build binary
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build-binary:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements*.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - name: 'Run PyInstaller'
+        run: ./pyinstaller.bat
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: get_token
+          path: dist/get_token.exe
